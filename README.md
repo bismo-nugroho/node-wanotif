@@ -38,11 +38,13 @@ $dbs = "wa";
 3.  you can modify code in sendHook.php for any command that you want to response with
 
 4. set your website path
+```
 
 - Info
 if you want to change browser name in wa log change file :
 nodemodules\@adiwajshing\baileys\lib\WAConnection/Utils.js
-```
+
+``` info
 Line : 45 =>    baileys: browser => ['your broser name', browser, '18.04'],
 ```
 
