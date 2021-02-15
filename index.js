@@ -61,7 +61,6 @@ async function checkContact(client, dest) {
 	//check contact if exist on current chat
 	var len = 0;
 	const messages = await client.loadMessages(dest, 1);
-	//console.log("msgs=",messages[0]);
 	var msg = JSON.stringify(messages);
 	msg = JSON.parse(msg);
 	len = msg.messages.length;
@@ -76,7 +75,6 @@ async function checkNewMessage(client) {
 	data = {};
 	try {
 		var voss = await fetchText(webHook + '/getHook.php');
-		//console.log("response from checkMessage = " + voss);
 		data = JSON.parse(voss);
 		console.log("response from checkMessage = " + voss);
 	} catch (e) {
@@ -88,9 +86,6 @@ async function checkNewMessage(client) {
 		var dests = data.dest + "@c.us";
 		const isExists = await checkContact(client, dests);
 
-		//const messages = await client.loadMessages (dests, 1);
-		// console.log("got back from chatid = "+dests + "=" + messages + " messages",messages);
-
 		if (isExists) {
 			var dest = data.dest + "@s.whatsapp.net";
 			data.idchat = dest;
@@ -98,7 +93,6 @@ async function checkNewMessage(client) {
 			arrmsgs.push(data);
 		} else {
 			const exists = await client.isOnWhatsApp(data.dest);
-			console.log("existed=", exists);
 			if (exists) {
 				//contact is found
 				data.idchat = exists.jid;
@@ -112,7 +106,6 @@ async function checkNewMessage(client) {
 				chat.status = 'ERROR';
 				chat.key.id = 0;
 				data.idchat = "not found";
-				//console.log('body match');
 				msg.chat_id = chat.key.id;
 				msg.ack = 0;
 				var ms = JSON.stringify(msg);
@@ -123,7 +116,6 @@ async function checkNewMessage(client) {
 
 		sleeps(intervalcheck * 1000).then(async () => {
 			await checkNewMessage(client);
-			//	console.log('Check Message Routine...');
 		});
 	}
 }
@@ -134,7 +126,6 @@ async function ticks() {
 	counts++;
 	sleeps(1000).then(async () => {
 		await ticks();
-		//	console.log('Check Message Routine...');
 	});
 }
 
@@ -151,18 +142,14 @@ function sendMessageText(client, from, teks, text) {
 
 async function updateChatStatus(client, chat, msg) {
 	//update status , update to database that message has been sent
-	console.log('body match');
 	msg.chat_id = chat.key.id;
 	msg.ack = getAck(chat.status);
 	var ms = JSON.stringify(msg);
-	console.log("encoded=", ms);
 	ms = encodeURIComponent(ms)
 	var res = await fetchText(webHook + '/updateHook.php?source=' + ms);
-	console.log('result=', res);
 	counts = 0;
 	sleeps(intervalcheck * 1000).then(async () => {
 		await checkNewMessage(client);
-		//	console.log('Check Message Routine...');
 	});
 }
 
@@ -174,7 +161,7 @@ async function starts() {
 	client.on('qr', () => {
 		console.log(color('[', 'white'), color('!', 'red'), color(']', 'white'), color(' Scan the qr code above'))
 	})
-    
+
 	//if credential log has been found, connect without qr
 	fs.existsSync('./Credential.json') && client.loadAuthInfo('./Credential.json')
 	client.on('connecting', () => {
@@ -186,12 +173,13 @@ async function starts() {
 		arrmsgs = [];
 		success('2', 'Connected')
 		//const time = moment.tz('Asia/Jakarta').format('YYYY-MM-DD HH:mm:ss')
-		//sendMessageText(client,'6289635866667@s.whatsapp.net',"wa initilised -"+time,text);
+		// Send WA to inform that wa notif restart
+		//sendMessageText(client,'628xxxx@s.whatsapp.net',"WA initilised -"+time,text);
 		if (counts == -1) {
-			ticks();
+			//ticks(); //unused
 			sleeps(intervalcheck * 1000).then(async () => {
 				await checkNewMessage(client);
-				//console.log('Check Message Routine...');
+
 			});
 		}
 
@@ -219,9 +207,6 @@ async function starts() {
 				var msgs = JSON.parse(msg);
 				console.log(msgs);
 			}
-
-			//console.log("chat-update=",JSON.stringify(chat));
-			//  console.log("statuss=",chats.status);
 		} catch (e) {
 			console.log('Error : %s', color(e, 'red'))
 		}
@@ -271,10 +256,6 @@ async function starts() {
 			const from = chat.key.remoteJid
 			const type = Object.keys(chat.message)[0]
 
-			console.log("content=", content);
-			console.log("from=", from);
-			console.log("types=", type);
-			const apiKey = 'Your Api Key' // contact me on whatsapp wa.me/6285892766102
 			//const { text, extendedText, contact, location, liveLocation, image, video, sticker, document, audio, product } = MessageType
 			const time = moment.tz('Asia/Jakarta').format('DD/MM HH:mm:ss')
 			body = (type === 'conversation' && chat.message.conversation) ? chat.message.conversation : (type == 'imageMessage') && chat.message.imageMessage.caption.startsWith(prefix) ? chat.message.imageMessage.caption : (type == 'videoMessage') && chat.message.videoMessage.caption.startsWith(prefix) ? chat.message.videoMessage.caption : (type == 'extendedTextMessage') && chat.message.extendedTextMessage.text.startsWith(prefix) ? chat.message.extendedTextMessage.text : ''
@@ -332,7 +313,8 @@ async function starts() {
 			const isWelkom = isGroup ? welkom.includes(from) : false
 			const isNsfw = isGroup ? nsfw.includes(from) : false
 			const isSimi = isGroup ? samih.includes(from) : false
-			const isOwner = ownerNumber.includes(sender)
+			const isOwner = ownerNumber.includes(sender);
+			
 			const isUrl = (url) => {
 				return url.match(new RegExp(/https?:\/\/(www\.)?[-a-zA-Z0-9@:%._+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_+.~#?&/=]*)/, 'gi'))
 			}
@@ -351,11 +333,6 @@ async function starts() {
 			const isQuotedImage = type === 'extendedTextMessage' && content.includes('imageMessage')
 			const isQuotedVideo = type === 'extendedTextMessage' && content.includes('videoMessage')
 			const isQuotedSticker = type === 'extendedTextMessage' && content.includes('stickerMessage')
-			// if (!isGroup && isCmd) console.log('\x1b[1;31m~\x1b[1;37m>', '[\x1b[1;32mEXEC\x1b[1;37m]', time, color(command), 'from', color(sender.split('@')[0]), 'args :', color(args.length))
-			// if (!isGroup && !isCmd) console.log('\x1b[1;31m~\x1b[1;37m>', '[\x1b[1;31mRECV\x1b[1;37m]', time, color('Message'), 'from', color(sender.split('@')[0]), 'args :', color(args.length))
-			// if (isCmd && isGroup) console.log('\x1b[1;31m~\x1b[1;37m>', '[\x1b[1;32mEXEC\x1b[1;37m]', time, color(command), 'from', color(sender.split('@')[0]), 'in', color(groupName), 'args :', color(args.length))
-			// if (!isCmd && isGroup) console.log('\x1b[1;31m~\x1b[1;37m>', '[\x1b[1;31mRECV\x1b[1;37m]', time, color('Message'), 'from', color(sender.split('@')[0]), 'in', color(groupName), 'args :', color(args.length))
-
 
 			const bodys = encodeURIComponent(body);
 			const froms = encodeURIComponent(from);
@@ -368,11 +345,9 @@ async function starts() {
 				data.message = body;
 
 				var ms = JSON.stringify(data);
-				console.log("encoded=", ms);
 				ms = encodeURIComponent(ms)
 
 				voss = await fetchText(webHook + '/sendHook.php?source=' + ms);
-				console.log("response from web", voss);
 				voss = JSON.parse(voss);
 
 				if (voss.response != "") {
