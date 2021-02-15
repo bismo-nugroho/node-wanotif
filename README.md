@@ -18,22 +18,25 @@ npm install
 
 ### Settings
 
+- index.js
 ```wa-notif
 intervalcheck = 5; // 5 second
 webHook = 'http://khataman.web/api'; <== your php api
 ```
 
+- Backend
 ``` backend php
 1. create yout database from wa.sql dump file
 
 2. set your mysqldb
-# file coninfo.db
+file coninfo.db
 $hostdb = "localhost";
 $userdb = "root";
 $passdb = "";
 $dbs = "wa";
 
 3.  you can modify code in sendHook.php for any command that you want to response with
+
 4. set your website path
 
 ```
