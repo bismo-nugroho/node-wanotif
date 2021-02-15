@@ -37,6 +37,7 @@ function checkElapsed() {
 	}
 }
 
+
 function getAck(stats) {
 	//ack map
 	switch (stats) {
