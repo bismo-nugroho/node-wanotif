@@ -41,6 +41,13 @@ $dbs = "wa";
 
 ```
 
+- Info
+```
+if you want to change browser name in wa log change file 
+from modules\@adiwajshing\baileys\lib\WAConnection/Utils.js
+Line : 45 =>    baileys: browser => ['your broser name', browser, '18.04'],
+```
+
 ## Features
 1. Send notification to another WA contact using PHP API
 2. Reply for some command eg: /appr for approve 
