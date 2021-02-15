@@ -39,12 +39,10 @@ $dbs = "wa";
 
 4. set your website path
 
-```
-
 - Info
+if you want to change browser name in wa log change file :
+nodemodules\@adiwajshing\baileys\lib\WAConnection/Utils.js
 ```
-if you want to change browser name in wa log change file 
-from modules\@adiwajshing\baileys\lib\WAConnection/Utils.js
 Line : 45 =>    baileys: browser => ['your broser name', browser, '18.04'],
 ```
 
