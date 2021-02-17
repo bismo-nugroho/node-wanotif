@@ -1,0 +1,4 @@
+{
+    "webHook" : "http://localhost/api",
+    "quranWeb" : "http://localhost:3000"
+}
